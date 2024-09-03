@@ -1,0 +1,38 @@
+name: Build Python Binary
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller
+        pip install -r requirements.txt
+
+    - name: Build binary
+      run: |
+        pyinstaller --onefile ./api/main.py --name=yeschat2api --add-data=.env:.
+
+    - name: Archive binary
+      uses: actions/upload-artifact@v3
+      with:
+        name: python-binary
+        path: dist/
